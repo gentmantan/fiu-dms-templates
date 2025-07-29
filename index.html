@@ -94,35 +94,31 @@
     </div>
     <script>
       function getGarages(){
+        // Get the names of garages to be displayed
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.has('garages') ? console.log(urlParams.get('garages').split(",")) : null 
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
       }
       function getData(garages){
+        // Open the occupancy file and pass it into parseData
         var xhttp = new XMLHttpRequest();
-        var occupancyList = [];
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
-            occupancyList = parseData(this, garages);
+            parseData(this, garages);
           }
         };
         xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
         xhttp.send();
       }
 
-      function getHighestLevel(zoneName) { //Legacy
-        const match = zoneName.match(/Lvls?\s+(\d+)(?:\D+(\d+))?/i);
-        if (!match) return 0;
-        const firstNum = parseInt(match[1], 10);
-        return match[2] ? Math.max(firstNum, parseInt(match[2], 10)) : firstNum;
-      }
-
       function formatName(zoneName){
+        // Convert raw name to pretty name
         let nameFilter = new RegExp("PG[0-9]+|Lot [0-9]+|Parkview|MMC", "i")
         return zoneName.match(nameFilter)[0];
       }
 
       function formatCountType(zoneName, available){
+        // Create an object pairing count type with count value
         if (zoneName.match("Lvls 1")) {
           return { "Other": available };
         } else if (zoneName.match("Lvls 3")) {
@@ -133,7 +129,7 @@
       }
 
       function garageIndex(occupancyList, displayName){
-        //Find the index of the garage in the list, if none return -1
+        // Find the index of the garage in the list, if none return -1
         for (var i = 0; i < occupancyList.length; i++){
           if (occupancyList[i].displayName == displayName){
             return i;
@@ -143,10 +139,12 @@
       }
 
       function parseData(xml, garages){
-        const occupancyList = [];
+        // Parse occupancy file
+        const occupancyList = []; // All garages to be displayed
         const xmlDoc = xml.responseXML;
         const items = xmlDoc.getElementsByTagName("Occupancy");
-        for (var item of items) {
+
+        for (var item of items) { // Loop through all xml elements
           const zoneName = item.getElementsByTagName("ParkingZoneName")[0].textContent; //take off format name!
           const displayName = formatName(zoneName);
           const capacity = parseInt(item.getElementsByTagName("Capacity")[0].textContent, 10);
@@ -154,8 +152,9 @@
           const available = capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
 
-          garages.forEach(garageID => {
-            //Match for Lot * including those larger than 10
+          garages.forEach(garageID => { 
+            // Find if garage in xml file is located in `garages`.
+            // If so, add to occupancyList
             if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
               if (zoneName.match("Lvls")) {
                 if (occupancyIndex >= 0){
@@ -174,12 +173,14 @@
       }
 
       function setCounts(occupancyList) {
+        // Add counts to UI
         for (var i = 0; i < occupancyList.length; i++){
           insertCard("card-" + i, occupancyList[i].displayName, occupancyList[i].available);
         }
       }
 
       function insertCard(uniqueId, title, data) {
+        // Add a card, where each card is a unique garage
         const template = document.getElementById("card-template");
         const clone = document.importNode(template.content, true);
         const card = clone.querySelector(".card");
