@@ -123,7 +123,6 @@
       }
 
       function formatCountType(zoneName, available){
-        console.log(zoneName);
         if (zoneName.match("Lvls 1")) {
           return { "Other": available };
         } else if (zoneName.match("Lvls 3")) {
@@ -159,7 +158,12 @@
             //Match for Lot * including those larger than 10
             if (displayName.match(garageID + "$")){
               if (zoneName.match("Lvls")) {
-                occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available)});
+                if (occupancyIndex >= 0){
+                  const curr = occupancyList[occupancyIndex]["available"];
+                  occupancyList[occupancyIndex]["available"] = {...curr, ...formatCountType(zoneName, available)} ;
+                } else {
+                  occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available)});
+                }
               } else {
                 occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
               }
