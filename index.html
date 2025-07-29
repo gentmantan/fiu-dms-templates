@@ -156,7 +156,7 @@
 
           garages.forEach(garageID => {
             //Match for Lot * including those larger than 10
-            if (displayName.match(garageID + "$")){
+            if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
               if (zoneName.match("Lvls")) {
                 if (occupancyIndex >= 0){
                   const curr = occupancyList[occupancyIndex]["available"];
