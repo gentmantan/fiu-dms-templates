@@ -95,8 +95,8 @@
     <script>
       function getGarages(){
         const urlParams = new URLSearchParams(window.location.search);
-        urlParams.has('garages') ? console.log(urlParams.has('garages')) : null 
-        return urlParams.has('garages') ? urlParams.get('garages') : [ "Lot 1", "PG5" ];
+        urlParams.has('garages') ? console.log(urlParams.get('garages').split(",")) : null 
+        return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
       }
       function getData(garages){
         var xhttp = new XMLHttpRequest();
