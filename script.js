@@ -28,10 +28,23 @@ function formatName(zoneName){
 
 function resizeCards(numCards){
   //Given a number of garages, resize text accordingly 
+  // TODO: this should also resize based on the type of count
   if (numCards == 1) {
-    document.getElementsByClassName("title")[0].style = "font-size: 25cqb;";
-    document.getElementsByClassName("parking-type")[0].style = "font-size: 15cqb;";
-    document.getElementsByClassName("parking-value")[0].style = "font-size: 20cqb;";
+    if (document.getElementsByClassName("parking-type").length == 1){
+      document.getElementsByClassName("title")[0].style = "font-size: 30cqb;";
+      document.getElementsByClassName("parking-type")[0].style = "font-size: 15cqb;";
+      document.getElementsByClassName("parking-value")[0].style = "font-size: 25cqb;";
+    }
+  } else if (numCards == 2) {
+    for (var i = 0; i < 2; i++){
+      card = document.getElementById("card-" + i);
+      type = document.getElementById("card-" + i).getElementsByClassName("parking-type");
+      value = document.getElementById("card-" + i).getElementsByClassName("parking-value");
+      if (type.length == 1){
+        type[0].style = "font-size: 12cqb;";
+        value[0].style = "font-size: 22cqb;";
+      }
+    }
   }
 }
 
