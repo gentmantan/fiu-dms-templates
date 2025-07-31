@@ -1,9 +1,11 @@
 // script.js 
 // For security desk data
-function getGarages(){
+function getParams(){
   // Get the names of garages to be displayed
   const urlParams = new URLSearchParams(window.location.search);
-  urlParams.has('garages') ? console.log(urlParams.get('garages').split(",")) : null 
+  if (urlParams.has('hide-message')) {
+    document.getElementsByClassName("message")[0].style = "display: none";
+  }
   return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
 }
 function getData(garages){
@@ -68,6 +70,8 @@ function garageIndex(occupancyList, displayName){
 }
 
 function parseData(xml, garages){
+  // Remove old cards 
+  document.getElementById('card-grid').innerHTML = '';
   // Parse occupancy file
   const occupancyList = []; // All garages to be displayed
   const xmlDoc = xml.responseXML;
@@ -138,4 +142,5 @@ function insertCard(uniqueId, title, data) {
 
   document.getElementById("card-grid").appendChild(clone);
 }
-getData(getGarages());
+getData(getParams());
+setInterval(() => getData(getParams()), 3000);
