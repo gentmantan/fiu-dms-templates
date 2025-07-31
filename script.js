@@ -41,7 +41,7 @@ function resizeCards(numCards){
       type = document.getElementById("card-" + i).getElementsByClassName("parking-type");
       value = document.getElementById("card-" + i).getElementsByClassName("parking-value");
       if (type.length == 1){
-        type[0].style = "font-size: 12cqb;";
+        type[0].style = "font-size: 14cqb;";
         value[0].style = "font-size: 22cqb;";
       }
     }
