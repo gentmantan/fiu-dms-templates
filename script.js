@@ -4,7 +4,7 @@ function getParams(){
   // Get the names of garages to be displayed
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('hide-message')) {
-    document.getElementsByClassName("message")[0].style = "display: none";
+    document.getElementsByClassName("message-grid")[0].style = "display: none";
   }
   return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
 }
