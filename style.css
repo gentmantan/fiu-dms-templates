@@ -43,14 +43,18 @@ html,body {
   flex-direction: column;
   container-type: inline-size; <!-- allows dimensions to be added -->
 }
-.message {
+.message-grid {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
   font-size: 6cqi;
+}
+.message {
+  font-size: 12cqh;
   text-align: center;
   font-width: condensed;
+  white-space: nowrap;
 }
 .hr-gold {
   border: 1cqb solid #B6862C;
