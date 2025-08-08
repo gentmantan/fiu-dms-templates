@@ -1,5 +1,7 @@
 // script.js 
 // For security desk data
+let occupancyList = []; // All garages to be displayed
+
 function getParams(){
   // Get the names of garages to be displayed
   const urlParams = new URLSearchParams(window.location.search);
@@ -108,7 +110,6 @@ function garageIndex(occupancyList, displayName){
 
 function parseData(xml, garages){
   // Parse occupancy file
-  const occupancyList = []; // All garages to be displayed
   const xmlDoc = xml.responseXML;
   const items = xmlDoc.getElementsByTagName("Occupancy");
 
@@ -143,12 +144,10 @@ function parseData(xml, garages){
       }
     });
   }
-  setCounts(occupancyList);
   resizeCards();
 }
 
 function parseDataSensors(xml, garages){
-  const occupancyList = []; // All garages to be displayed
   const xmlDoc = xml.responseXML;
   const items = xmlDoc.getElementsByTagName("Garage");
 
@@ -173,15 +172,17 @@ function parseDataSensors(xml, garages){
       }
     });
   }
-  setCounts(occupancyList);
   resizeCards();
 }
 
-function setCounts(occupancyList) {
+function setCounts() {
+  // Remove old cards 
+  document.getElementById('card-grid').innerHTML = '';
   // Add counts to UI
   for (var i = 0; i < occupancyList.length; i++){
     insertCard("card-" + i, occupancyList[i].displayName, occupancyList[i].available);
   }
+  occupancyList = [];
 }
 
 function insertCard(uniqueId, title, data) {
@@ -209,8 +210,7 @@ function insertCard(uniqueId, title, data) {
   document.getElementById("card-grid").appendChild(clone);
 }
 setInterval(function() {
-  // Remove old cards 
-  document.getElementById('card-grid').innerHTML = '';
   getData(getParams(), true);
   getData(getParams(), false);
+  setCounts();
 }, 5000);
