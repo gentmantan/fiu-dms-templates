@@ -26,10 +26,10 @@ function getData(garages, isSensors){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        parseData(this, filterData(garages, true));
+        parseDataSensors(this, filterData(garages, true));
       }
     };
-    xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
+    xhttp.open("GET", "http://localhost:8080/garagecount.xml", true);
     xhttp.send();
   } else {
     var xhttp = new XMLHttpRequest();
@@ -106,8 +106,6 @@ function garageIndex(occupancyList, displayName){
 }
 
 function parseData(xml, garages){
-  // Remove old cards 
-  document.getElementById('card-grid').innerHTML = '';
   // Parse occupancy file
   const occupancyList = []; // All garages to be displayed
   const xmlDoc = xml.responseXML;
@@ -127,6 +125,7 @@ function parseData(xml, garages){
       if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
         if (zoneName.match("Lvls")) {
           if (occupancyIndex >= 0){
+            //If garage is split, parking, keep track of the existing count name and value
             const curr = occupancyList[occupancyIndex]["available"];
             //Upper floors should show up at the top
             if (getCountType(zoneName) == "upper")
@@ -140,6 +139,36 @@ function parseData(xml, garages){
         } else {
           occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
         }
+      }
+    });
+  }
+  setCounts(occupancyList);
+  resizeCards(occupancyList.length);
+}
+
+function parseDataSensors(xml, garages){
+  const occupancyList = []; // All garages to be displayed
+  const xmlDoc = xml.responseXML;
+  const items = xmlDoc.getElementsByTagName("Garage");
+
+  for (var item of items) {
+    const garageName = item.getElementsByTagName("GarageName")[0].textContent; //take off format name!
+    const displayName = formatName(garageName);
+
+    const studentSpaces = parseInt(item.getElementsByTagName("StudentSpaces")[0].textContent, 10);
+    const studentMax = parseInt(item.getElementsByTagName("StudentMax")[0].textContent, 10);
+    const studentAvailable = { "Student": studentMax - studentSpaces };
+
+    const otherSpaces = parseInt(item.getElementsByTagName("OtherSpaces")[0].textContent, 10);
+    const otherMax = parseInt(item.getElementsByTagName("OtherMax")[0].textContent, 10);
+    const otherAvailable = { "Other": otherMax - otherSpaces };
+
+    garages.forEach(garageID => { 
+      // Find if garage in xml file is located in `garages`.
+      // If so, add to occupancyList
+      if (displayName.match(garageID + "$")){
+        occupancyList.push({ garageName, displayName,
+          available: { ...studentAvailable, ...otherAvailable } });
       }
     });
   }
@@ -178,7 +207,9 @@ function insertCard(uniqueId, title, data) {
 
   document.getElementById("card-grid").appendChild(clone);
 }
-getData(getParams());
 setInterval(function() {
+  // Remove old cards 
+  document.getElementById('card-grid').innerHTML = '';
+  getData(getParams(), true);
   getData(getParams(), false);
 }, 5000);
