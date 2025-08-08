@@ -49,9 +49,10 @@ function formatName(zoneName){
   return zoneName.match(nameFilter)[0];
 }
 
-function resizeCards(numCards){
+function resizeCards(){
   //Given a number of garages, resize text accordingly 
   // TODO: this should also resize based on the type of count
+  numCards = document.getElementsByClassName("title").length;
   if (numCards == 1) {
     if (document.getElementsByClassName("parking-type").length == 1){
       document.getElementsByClassName("title")[0].style = "font-size: 30cqb;";
@@ -143,7 +144,7 @@ function parseData(xml, garages){
     });
   }
   setCounts(occupancyList);
-  resizeCards(occupancyList.length);
+  resizeCards();
 }
 
 function parseDataSensors(xml, garages){
@@ -173,7 +174,7 @@ function parseDataSensors(xml, garages){
     });
   }
   setCounts(occupancyList);
-  resizeCards(occupancyList.length);
+  resizeCards();
 }
 
 function setCounts(occupancyList) {
