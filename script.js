@@ -29,7 +29,7 @@ function getData(garages, isSensors){
         parseDataSensors(this, filterData(garages, true));
       }
     };
-    xhttp.open("GET", "http://localhost:8080/garagecount.xml", true);
+    xhttp.open("GET", "http://localhost:8080/garagecounts.xml", true);
     xhttp.send();
   } else {
     var xhttp = new XMLHttpRequest();
