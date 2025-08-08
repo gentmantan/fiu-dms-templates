@@ -8,16 +8,39 @@ function getParams(){
   }
   return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
 }
-function getData(garages){
-  // Open the occupancy file and pass it into parseData
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      parseData(this, garages);
+function filterData(garages, isSensors) {
+  sensorsList = [ "PG1", "PG2", "PG4", "PG6" ];
+  garageList = [];
+  garages.forEach(function(garage){
+    if (isSensors && sensorsList.includes(garage)) {
+      garageList.push(garage)
+    } else if (!isSensors && !sensorsList.includes(garage)){
+      garageList.push(garage)
     }
-  };
-  xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
-  xhttp.send();
+  })
+  return garageList;
+}
+function getData(garages, isSensors){
+  // Open the occupancy file and pass it into parseData
+  if (isSensors) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        parseData(this, filterData(garages, true));
+      }
+    };
+    xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
+    xhttp.send();
+  } else {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        parseData(this, filterData(garages, false));
+      }
+    };
+    xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
+    xhttp.send();
+  } //TODO: refactor duplicate blocks
 }
 
 function formatName(zoneName){
@@ -156,4 +179,6 @@ function insertCard(uniqueId, title, data) {
   document.getElementById("card-grid").appendChild(clone);
 }
 getData(getParams());
-setInterval(() => getData(getParams()), 3000);
+setInterval(function() {
+  getData(getParams(), false);
+}, 5000);
