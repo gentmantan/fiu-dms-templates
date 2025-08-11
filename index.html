@@ -269,18 +269,36 @@ html,body {
         }
       }
 
+      function alignItemsByQuery() {
+        // Ensure occupancyList is in the same order as the query string
+        sortedList = [];
+        garages = getParams();
+
+        garages.forEach(garageID => {
+          occupancyList.forEach(occupancy => {
+            if (occupancy.displayName == garageID) {
+              sortedList.push(occupancy);
+            }
+          });
+        });
+        return sortedList;
+      }
+
       function setCounts() {
-        // Remove old cards 
-        document.getElementById('card-grid').innerHTML = '';
+        const cardGrid = document.getElementById('card-grid');
+        const cardFragment = document.createDocumentFragment();
+
+        sortedList = alignItemsByQuery();
         // Add counts to UI
-        for (var i = 0; i < occupancyList.length; i++){
-          insertCard("card-" + i, occupancyList[i].displayName, occupancyList[i].available);
+        for (var i = 0; i < sortedList.length; i++){
+          insertCard(cardFragment, "card-" + i, sortedList[i].displayName, sortedList[i].available);
         }
+        cardGrid.replaceChildren(cardFragment);
         resizeCards();
         occupancyList = [];
       }
 
-      function insertCard(uniqueId, title, data) {
+      function insertCard(cardFragment, uniqueId, title, data) {
         // Add a card, where each card is a unique garage
         const template = document.getElementById("card-template");
         const clone = document.importNode(template.content, true);
@@ -301,8 +319,7 @@ html,body {
           clone.querySelector(".data").append(parkingType);
           clone.querySelector(".data").append(parkingValue);
         }
-
-        document.getElementById("card-grid").appendChild(clone);
+        cardFragment.append(clone);
       }
       setInterval(function() {
         getData(getParams(), true);
