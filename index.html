@@ -35,8 +35,9 @@ html,body {
 .data {
   display: flex;
   height: 100%;
-  flex-direction: column;
-  justify-content: flex-end;
+  width: 100%;
+  flex-direction: column; /* Change to row for wide displays */
+  justify-content: space-evenly;
   text-align: center;
 }
 .card p, h2, h3 {
@@ -67,6 +68,12 @@ html,body {
 }
 .hr-gold {
   border: 1cqb solid #B6862C;
+}
+.parking-datum {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
 }
 .parking-type {
   font-size: 10cqb;
@@ -153,9 +160,17 @@ html,body {
         numCards = document.getElementsByClassName("title").length;
         if (numCards == 1) {
           if (document.getElementsByClassName("parking-type").length == 1){
+            // If not split lot 
             document.getElementsByClassName("title")[0].style = "font-size: 30cqb;";
             document.getElementsByClassName("parking-type")[0].style = "font-size: 15cqb;";
             document.getElementsByClassName("parking-value")[0].style = "font-size: 25cqb;";
+          } else if (document.getElementsByClassName("parking-type").length == 2) {
+            document.getElementsByClassName("data")[0].style = "flex-direction: row;";
+            document.getElementsByClassName("title")[0].style = "font-size: 30cqb;";
+            document.getElementsByClassName("parking-type")[0].style = "font-size: 15cqb;";
+            document.getElementsByClassName("parking-value")[0].style = "font-size: 25cqb;";
+            document.getElementsByClassName("parking-type")[1].style = "font-size: 15cqb;";
+            document.getElementsByClassName("parking-value")[1].style = "font-size: 25cqb;";
           }
         } else if (numCards == 2) {
           for (var i = 0; i < 2; i++){
@@ -307,6 +322,9 @@ html,body {
         clone.querySelector(".title").textContent = title;
 
         for (const [key, value] of Object.entries(data)) {
+          // Create a parking datum (type and value)
+          const parkingDatum = document.createElement("div");
+          parkingDatum.className = "parking-datum";
           // Create count type element (Student, Other)
           const parkingType = document.createElement("h3");
           parkingType.className = "parking-type";
@@ -316,8 +334,10 @@ html,body {
           parkingValue.className = "parking-value";
           parkingValue.textContent = value;
 
-          clone.querySelector(".data").append(parkingType);
-          clone.querySelector(".data").append(parkingValue);
+          parkingDatum.append(parkingType);
+          parkingDatum.append(parkingValue);
+
+          clone.querySelector(".data").append(parkingDatum);
         }
         cardFragment.append(clone);
       }
