@@ -240,7 +240,6 @@ html,body {
             }
           });
         }
-        resizeCards();
       }
 
       function parseDataSensors(xml, garages){
@@ -268,7 +267,6 @@ html,body {
             }
           });
         }
-        resizeCards();
       }
 
       function setCounts() {
@@ -278,6 +276,7 @@ html,body {
         for (var i = 0; i < occupancyList.length; i++){
           insertCard("card-" + i, occupancyList[i].displayName, occupancyList[i].available);
         }
+        resizeCards();
         occupancyList = [];
       }
 
