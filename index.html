@@ -104,6 +104,7 @@ html,body {
     </div>
     <script>
       let occupancyList = []; // All garages to be displayed
+      let fullGarages = [];
 
       function getParams(){
         // Get the names of garages to be displayed
@@ -127,11 +128,12 @@ html,body {
       }
       function getData(garages, isSensors){
         // Open the occupancy file and pass it into parseData
+        //TODO: refactor duplicate blocks
         if (isSensors) {
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-              parseDataSensors(this, filterData(garages, true));
+              parseDataSensors(this, filterData(garages, true), false);
             }
           };
           xhttp.open("GET", "http://localhost:8080/garagecounts.xml", true);
@@ -140,12 +142,12 @@ html,body {
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-              parseData(this, filterData(garages, false));
+              parseData(this, filterData(garages, false), false);
             }
           };
           xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
           xhttp.send();
-        } //TODO: refactor duplicate blocks
+        } 
       }
 
       function formatName(zoneName){
@@ -219,7 +221,7 @@ html,body {
         return -1;
       }
 
-      function parseData(xml, garages){
+      function parseData(xml, garages, getFull){
         // Parse occupancy file
         const xmlDoc = xml.responseXML;
         const items = xmlDoc.getElementsByTagName("Occupancy");
@@ -234,30 +236,39 @@ html,body {
 
           garages.forEach(garageID => { 
             // Find if garage in xml file is located in `garages`.
+            if (getFull) {
+              if (available == 0 && !fullGarages.includes(displayName)){
+                // If garage is full, add to fullGarages 
+                fullGarages.push(displayName);
+              }
+            } else {
             // If so, add to occupancyList
-            if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
-              if (zoneName.match("Lvls")) {
-                if (occupancyIndex >= 0){
-                  //If garage is split, parking, keep track of the existing count name and value
-                  const curr = occupancyList[occupancyIndex]["available"];
-                  //Upper floors should show up at the top
-                  if (getCountType(zoneName) == "upper")
-                    occupancyList[occupancyIndex]["available"] = {...formatCountType(zoneName, available), ...curr};
-                  else
-                    occupancyList[occupancyIndex]["available"] = {...curr, ...formatCountType(zoneName, available)};
-
+              if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
+                if (zoneName.match("Lvls")) {
+                  // Handle split garages
+                  if (occupancyIndex >= 0) {
+                    //If this is the second split occupancy entry (student or other), keep track of the existing count name and value
+                    const curr = occupancyList[occupancyIndex]["available"];
+                    if (getCountType(zoneName) == "upper")
+                      //Upper floors should show up at the top
+                      occupancyList[occupancyIndex]["available"] = {...formatCountType(zoneName, available), ...curr};
+                    else
+                      occupancyList[occupancyIndex]["available"] = {...curr, ...formatCountType(zoneName, available)};
+                  } else {
+                    // If this is the first split occupancy garage entry (student or other)
+                    occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available)});
+                  }
                 } else {
-                  occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available)});
+                  occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
                 }
-              } else {
-                occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
               }
             }
           });
         }
       }
 
-      function parseDataSensors(xml, garages){
+      function parseDataSensors(xml, garages, getFull){
+        // Parse sensor occupancy file
         const xmlDoc = xml.responseXML;
         const items = xmlDoc.getElementsByTagName("Garage");
 
@@ -276,9 +287,15 @@ html,body {
           garages.forEach(garageID => { 
             // Find if garage in xml file is located in `garages`.
             // If so, add to occupancyList
-            if (displayName.match(garageID + "$")){
-              occupancyList.push({ garageName, displayName,
-                available: { ...studentAvailable, ...otherAvailable } });
+            if (getFull) {
+              if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName)){
+                fullGarages.push(displayName);
+              }
+            } else {
+              if (displayName.match(garageID + "$")){
+                occupancyList.push({ garageName, displayName,
+                  available: { ...studentAvailable, ...otherAvailable } });
+              }
             }
           });
         }
@@ -311,6 +328,7 @@ html,body {
         cardGrid.replaceChildren(cardFragment);
         resizeCards();
         occupancyList = [];
+        fullGarages = [];
       }
 
       function insertCard(cardFragment, uniqueId, title, data) {
