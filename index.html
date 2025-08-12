@@ -229,7 +229,7 @@ html,body {
           const displayName = formatName(zoneName);
           const capacity = parseInt(item.getElementsByTagName("Capacity")[0].textContent, 10);
           const vehicles = parseInt(item.getElementsByTagName("Vehicles")[0].textContent, 10);
-          const available = capacity - vehicles;
+          const available = capacity - vehicles < 0 ? 0 : capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
 
           garages.forEach(garageID => { 
@@ -267,11 +267,11 @@ html,body {
 
           const studentSpaces = parseInt(item.getElementsByTagName("StudentSpaces")[0].textContent, 10);
           const studentMax = parseInt(item.getElementsByTagName("StudentMax")[0].textContent, 10);
-          const studentAvailable = { "Student": studentMax - studentSpaces };
+          const studentAvailable = { "Student": studentMax - studentSpaces <= 0 ? "Full" : studentMax - studentSpaces };
 
           const otherSpaces = parseInt(item.getElementsByTagName("OtherSpaces")[0].textContent, 10);
           const otherMax = parseInt(item.getElementsByTagName("OtherMax")[0].textContent, 10);
-          const otherAvailable = { "Other": otherMax - otherSpaces };
+          const otherAvailable = { "Other": otherMax - otherSpaces <= 0 ? "Full" : otherMax - otherSpaces };
 
           garages.forEach(garageID => { 
             // Find if garage in xml file is located in `garages`.
