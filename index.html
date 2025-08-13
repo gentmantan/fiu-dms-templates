@@ -106,7 +106,8 @@ html,body {
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
       let garageParams = getParams();
-      const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"]]; // Define garages to swap between when full
+      const dataSources = { "sensors": "http://localhost:8080/garagecounts-utf8.xml", "genetec": "http://localhost:8080/occupancy.xml"};
+      //TODO: Use less dynamic global variables
 
       function getParams(){
         // Get the names of garages to be displayed
@@ -128,52 +129,21 @@ html,body {
         })
         return garageList;
       }
-      function getData(garages, isSensors, isCheckFull){
-        // Open the occupancy file and pass it into parseData
-        //TODO: refactor duplicate blocks
-        //TODO: separate get request from data parsing
-        switch (true) {
-          case isSensors && !isCheckFull:
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                parseDataSensors(this, filterData(garages, true), false);
-              }
-            };
-            xhttp.open("GET", "http://localhost:8080/garagecounts.xml", true);
-            xhttp.send();
-            break;
-          case !isSensors && !isCheckFull:
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                parseData(this, filterData(garages, false), false);
-              }
-            };
-            xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
-            xhttp.send();
-            break;
-          case isSensors && isCheckFull:
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                parseDataSensors(this, filterData(garages, true), true);
-              }
-            };
-            xhttp.open("GET", "http://localhost:8080/garagecounts.xml", true);
-            xhttp.send();
-            break;
-          case !isSensors && isCheckFull:
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                parseData(this, filterData(garages, false), true);
-              }
-            };
-            xhttp.open("GET", "http://localhost:8080/occupancy.xml", true);
-            xhttp.send();
-            break;
+      async function fetchXML(type){
+        var xmlText = "";
+        const requestParams = {
+          cache: "no-store",
+        };
+        if (type == "sensors"){
+          const response = await fetch(dataSources["sensors"], requestParams);
+          xmlText = await response.text(); 
+        } else if (type == "genetec"){
+          const response = await fetch(dataSources["genetec"], requestParams);
+          xmlText = await response.text();
         }
+        const parser = new DOMParser();
+        xmlDoc = parser.parseFromString(xmlText, "application/xml");
+        return xmlDoc;
       }
 
       function formatName(zoneName){
@@ -284,20 +254,17 @@ html,body {
       }
 
       function swapFullGarages(){
-        getData(garageParams, true, true);
-        getData(garageParams, false, true);
-        console.log("Full garages: " + fullGarages);
         fullGarages.forEach(garage => {
           if (garageParams.includes(garage)) {
             garageParams[garageParams.indexOf(garage)] = getAlternativeGarage(garage);
           }
-        })
+        });
+        console.log("Full garages: " + fullGarages);
       }
 
       function parseData(xml, garages, getFull){
         // Parse occupancy file
-        const xmlDoc = xml.responseXML;
-        const items = xmlDoc.getElementsByTagName("Occupancy");
+        const items = xml.getElementsByTagName("Occupancy");
 
         for (var item of items) { // Loop through all xml elements
           const zoneName = item.getElementsByTagName("ParkingZoneName")[0].textContent; //take off format name!
@@ -342,8 +309,7 @@ html,body {
 
       function parseDataSensors(xml, garages, getFull){
         // Parse sensor occupancy file
-        const xmlDoc = xml.responseXML;
-        const items = xmlDoc.getElementsByTagName("Garage");
+        const items = xml.getElementsByTagName("Garage");
 
         for (var item of items) {
           const garageName = item.getElementsByTagName("GarageName")[0].textContent; //take off format name!
@@ -431,14 +397,32 @@ html,body {
         }
         cardFragment.append(clone);
       }
-      setInterval(function() {
+      async function main(){
+        const fetchXMLs = await Promise.allSettled([fetchXML("genetec"), fetchXML("sensors")]);
+        fetchXMLs.forEach(result => {
+          // Populate fullGarages to keep track of full garages
+          if (result.value.getElementsByTagName("OccupancyExport").length > 0){
+            parseData(result.value, filterData(garageParams, false), true);
+          } else if (result.value.getElementsByTagName("GarageCount").length > 0) {
+            parseDataSensors(result.value, filterData(garageParams, true), true);
+          }
+        }); // TODO: Why is it only appending full lots of a certain data source when counts
+            // of the corresponding data source are displayed?
         swapFullGarages();
-        getData(garageParams, true, false);
-        getData(garageParams, false, false);
-        setCounts();
+        fetchXMLs.forEach(result => {
+          // Populate occupancyList with count data 
+          if (result.value.getElementsByTagName("OccupancyExport").length > 0){
+            parseData(result.value, filterData(garageParams, false), false);
+          } else if (result.value.getElementsByTagName("GarageCount").length > 0) {
+            parseDataSensors(result.value, filterData(garageParams, true), false);
+          }
+        });
+        setCounts(); // Add the actual divs to display counts
         fullGarages = [];
         garageParams = getParams();
-        //TODO: improve initalization
+      }
+      setInterval(async () => {
+        await main();
       }, 1000);
     </script> 
   </body>
