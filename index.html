@@ -105,6 +105,8 @@ html,body {
     <script>
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
+      let garageParams = getParams();
+      const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"]]; // Define garages to swap between when full
 
       function getParams(){
         // Get the names of garages to be displayed
@@ -221,6 +223,42 @@ html,body {
         return -1;
       }
 
+      function getAlternativeGarage(garage){
+        var garageGroupIndex = -1;
+        var startIndex = -1;
+        var swapIndex = -1;
+        for (var i = 0; i < garageGroups.length; i++) {
+          // Find the garage group that a garage belongs in
+          const group = garageGroups[i];
+          if (group.includes(garage)) {
+            garageGroupIndex = i;
+            startIndex = group.indexOf(garage);
+            break;
+          }
+        }
+        
+        // If there exists a garage group, then execute below to find an alternate garage
+        if (garageGroupIndex != -1){
+          const group = garageGroups[garageGroupIndex]
+          for (var i = 0; i < group.length; i++) {
+            const currIndex = (startIndex + i) % group.length
+            if (!garageParams.includes(group[currIndex])){
+              // If a swap candidate will already be displayed, skip to avoid duplicate count 
+              swapIndex = currIndex;
+              break;
+            } else {
+            }
+          }
+        }
+          
+        // If we found an alternate garage, return it. Otherwise, return the previous garage
+        if (swapIndex != -1) {
+          return garageGroups[garageGroupIndex][swapIndex];
+        } else {
+          return garage;
+        }
+      }
+
       function parseData(xml, garages, getFull){
         // Parse occupancy file
         const xmlDoc = xml.responseXML;
@@ -304,9 +342,8 @@ html,body {
       function alignItemsByQuery() {
         // Ensure occupancyList is in the same order as the query string
         sortedList = [];
-        garages = getParams();
 
-        garages.forEach(garageID => {
+        garageParams.forEach(garageID => {
           occupancyList.forEach(occupancy => {
             if (occupancy.displayName == garageID) {
               sortedList.push(occupancy);
@@ -360,8 +397,8 @@ html,body {
         cardFragment.append(clone);
       }
       setInterval(function() {
-        getData(getParams(), true);
-        getData(getParams(), false);
+        getData(garageParams, true);
+        getData(garageParams, false);
         setCounts();
       }, 5000);
     </script> 
