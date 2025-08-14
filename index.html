@@ -283,7 +283,7 @@ html,body {
           const available = capacity - vehicles < 0 ? 0 : capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
           if (getFull) {
-            if (available == 0 && !fullGarages.includes(displayName) && !sensorsList.includes(displayName)){
+            if (available == 0 && getCountType(zoneName) == "upper" && !fullGarages.includes(displayName) && !sensorsList.includes(displayName)){
               // If garage is full, add to fullGarages 
               fullGarages.push(displayName);
             }
