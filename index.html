@@ -116,7 +116,7 @@ html,body {
         if (urlParams.has('hide-message')) {
           document.getElementsByClassName("message-grid")[0].style = "display: none";
         }
-        return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
+        return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG5" ];
       }
       function filterData(garages, isSensors) {
         garageList = [];
@@ -263,8 +263,10 @@ html,body {
 
       function swapFullGarages(){
         fullGarages.forEach(garage => {
-          if (garageParams.includes(garage)) {
-            garageParams[garageParams.indexOf(garage)] = getAlternativeGarage(garage);
+          const altGarage = getAlternativeGarage(garage);
+          if (garageParams.includes(garage) && !garageParams.includes(altGarage) && garageParams.length < 3) {
+            // Put a third alternative garage if one or more of garages to be displayed are full
+            garageParams.push(altGarage);
           }
         });
       }
