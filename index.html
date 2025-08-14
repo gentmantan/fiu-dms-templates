@@ -107,6 +107,7 @@ html,body {
       let fullGarages = [];
       let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
+      const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       //TODO: Use less dynamic global variables
 
       function getParams(){
@@ -118,7 +119,6 @@ html,body {
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG3", "PG5" ];
       }
       function filterData(garages, isSensors) {
-        sensorsList = [ "PG1", "PG2", "PG4", "PG6" ];
         garageList = [];
         garages.forEach(function(garage){
           if (isSensors && sensorsList.includes(garage)) {
@@ -281,7 +281,7 @@ html,body {
           const available = capacity - vehicles < 0 ? 0 : capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
           if (getFull) {
-            if (available == 0 && !fullGarages.includes(displayName)){
+            if (available == 0 && !fullGarages.includes(displayName) && !sensorsList.includes(displayName)){
               // If garage is full, add to fullGarages 
               fullGarages.push(displayName);
             }
@@ -329,7 +329,7 @@ html,body {
           const otherMax = parseInt(item.getElementsByTagName("OtherMax")[0].textContent, 10);
           const otherAvailable = { "Other": otherMax - otherSpaces <= 0 ? "Full" : otherMax - otherSpaces };
           if (getFull) {
-            if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName)){
+            if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName) && sensorsList.includes(displayName)){
               fullGarages.push(displayName);
             }
           } else {
