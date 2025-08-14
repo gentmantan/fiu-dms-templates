@@ -106,7 +106,7 @@ html,body {
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
       let garageParams = getParams();
-      const dataSources = { "sensors": "http://localhost:8080/garagecounts-utf8.xml", "genetec": "http://localhost:8080/occupancy.xml"};
+      const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       //TODO: Use less dynamic global variables
 
       function getParams(){
@@ -133,10 +133,18 @@ html,body {
         var xmlText = "";
         const requestParams = {
           cache: "no-store",
+          mode: "cors"
         };
         if (type == "sensors"){
-          const response = await fetch(dataSources["sensors"], requestParams);
-          xmlText = await response.text(); 
+          const response = await fetch(dataSources["sensors"], requestParams)
+            .then(function (response) {
+              return response.arrayBuffer();
+            })
+            .then(function (buffer) {
+              const decoder = new TextDecoder('utf-16le');
+              const text = decoder.decode(buffer);
+              xmlText = text;
+            }); // Sensor counts data is encoded in utf-16le and needs to be converted
         } else if (type == "genetec"){
           const response = await fetch(dataSources["genetec"], requestParams);
           xmlText = await response.text();
