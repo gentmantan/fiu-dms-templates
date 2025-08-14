@@ -406,6 +406,8 @@ html,body {
         cardFragment.append(clone);
       }
       async function main(){
+        garageParams = getParams();
+
         const fetchXMLs = await Promise.allSettled([fetchXML("genetec"), fetchXML("sensors")]);
         fetchXMLs.forEach(result => {
           // Populate fullGarages to keep track of full garages
@@ -427,8 +429,8 @@ html,body {
         });
         setCounts(); // Add the actual divs to display counts
         fullGarages = [];
-        garageParams = getParams();
       }
+      main();
       setInterval(async () => {
         await main();
       }, 1000);
