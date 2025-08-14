@@ -244,16 +244,16 @@ html,body {
           const group = garageGroups[garageGroupIndex]
           for (var i = 0; i < group.length; i++) {
             const currIndex = (startIndex + i) % group.length
-            if (!garageParams.includes(group[currIndex])){
+            if (!garageParams.includes(group[currIndex]) && !fullGarages.includes(group[currIndex])){
               // If a swap candidate will already be displayed, skip to avoid duplicate count 
+              // Also, if a swap candidate is full, skip it
               swapIndex = currIndex;
               break;
-            } else {
-            }
+            } 
           }
         }
           
-        // If we found an alternate garage, return it. Otherwise, return the previous garage
+        // If we found an alternate garage, return it. Otherwise, return the same garage
         if (swapIndex != -1) {
           return garageGroups[garageGroupIndex][swapIndex];
         } else {
@@ -267,7 +267,6 @@ html,body {
             garageParams[garageParams.indexOf(garage)] = getAlternativeGarage(garage);
           }
         });
-        console.log("Full garages: " + fullGarages);
       }
 
       function parseData(xml, garages, getFull){
@@ -281,16 +280,15 @@ html,body {
           const vehicles = parseInt(item.getElementsByTagName("Vehicles")[0].textContent, 10);
           const available = capacity - vehicles < 0 ? 0 : capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
-
-          garages.forEach(garageID => { 
-            // Find if garage in xml file is located in `garages`.
-            if (getFull) {
-              if (available == 0 && !fullGarages.includes(displayName)){
-                // If garage is full, add to fullGarages 
-                fullGarages.push(displayName);
-              }
-            } else {
-            // If so, add to occupancyList
+          if (getFull) {
+            if (available == 0 && !fullGarages.includes(displayName)){
+              // If garage is full, add to fullGarages 
+              fullGarages.push(displayName);
+            }
+          } else {
+            garages.forEach(garageID => { 
+              // Find if garage in xml file is located in `garages`.
+              // If so, add to occupancyList
               if (displayName.match(garageID + "$") && !zoneName.includes("Total")){
                 if (zoneName.match("Lvls")) {
                   // Handle split garages
@@ -310,8 +308,8 @@ html,body {
                   occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
                 }
               }
-            }
-          });
+            });
+          }
         }
       }
 
@@ -330,21 +328,21 @@ html,body {
           const otherSpaces = parseInt(item.getElementsByTagName("OtherSpaces")[0].textContent, 10);
           const otherMax = parseInt(item.getElementsByTagName("OtherMax")[0].textContent, 10);
           const otherAvailable = { "Other": otherMax - otherSpaces <= 0 ? "Full" : otherMax - otherSpaces };
-
+          if (getFull) {
+            if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName)){
+              fullGarages.push(displayName);
+            }
+          } else {
           garages.forEach(garageID => { 
             // Find if garage in xml file is located in `garages`.
             // If so, add to occupancyList
-            if (getFull) {
-              if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName)){
-                fullGarages.push(displayName);
-              }
-            } else {
+
               if (displayName.match(garageID + "$")){
                 occupancyList.push({ garageName, displayName,
                   available: { ...studentAvailable, ...otherAvailable } });
               }
-            }
-          });
+            });
+          }
         }
       }
 
@@ -416,9 +414,9 @@ html,body {
           } else if (result.value.getElementsByTagName("GarageCount").length > 0) {
             parseDataSensors(result.value, filterData(garageParams, true), true);
           }
-        }); // TODO: Why is it only appending full lots of a certain data source when counts
-            // of the corresponding data source are displayed?
+        });
         swapFullGarages();
+
         fetchXMLs.forEach(result => {
           // Populate occupancyList with count data 
           if (result.value.getElementsByTagName("OccupancyExport").length > 0){
