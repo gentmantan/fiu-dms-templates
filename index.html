@@ -85,7 +85,22 @@ html,body {
 .title {
   font-size: 18cqb;
 }
-    </style>
+#paw-overlay {
+  position: fixed;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10vw, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(13vh, 1fr));
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  opacity: 0.5;
+}
+.paw {
+  height: 12vh;
+}
+</style>
   </head>
   <body>
     <template id="card-template">
@@ -98,9 +113,11 @@ html,body {
     <div class="container">
       <div id="card-grid"></div>
       <div class="message-grid">
-        <img src="https://welcome.fiu.edu/_assets/images/stickers/sticker-paw-blue.svg" style="height: 12cqh;">
-        <h2 class="message">Please link your plate!</h2>
+        <img class="paw" src="http://localhost:8080/sticker-paw-blue.svg">
+        <h2 class="message">Please Link Your Plate!</h2>
       </div>
+    </div>
+    <div id="paw-overlay">
     </div>
     <script>
       let occupancyList = []; // All garages to be displayed
@@ -110,6 +127,20 @@ html,body {
       const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
       //TODO: Use less dynamic global variables
+
+      function drawPawGrid(){
+        const pawOverlay = document.getElementById("paw-overlay");
+        const pawFragment = document.createDocumentFragment();
+        for (var i = 0; i < 7; i++){
+          for (var j = 0; j < 10; j++){
+            const paw = document.createElement("img");
+            paw.className = "paw x-" + j + " y-" + i;
+            paw.setAttribute('src', 'http://localhost:8080/sticker-paw-blue.svg');
+            pawFragment.append(paw);
+          }
+        }
+        pawOverlay.append(pawFragment);
+      }
 
       function getParams(){
         // Get the names of garages to be displayed
