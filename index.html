@@ -108,6 +108,7 @@ html,body {
       let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
+      const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
       //TODO: Use less dynamic global variables
 
       function getParams(){
