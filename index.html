@@ -95,10 +95,10 @@ html,body {
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  opacity: 0.5;
 }
 .paw {
   height: 12vh;
+  opacity: 0.0;
 }
 </style>
   </head>
@@ -113,7 +113,7 @@ html,body {
     <div class="container">
       <div id="card-grid"></div>
       <div class="message-grid">
-        <img class="paw" src="http://localhost:8080/sticker-paw-blue.svg">
+        <img class="paw" src="http://localhost:8080/sticker-paw-blue.svg" style="opacity: 1.0;">
         <h2 class="message">Please Link Your Plate!</h2>
       </div>
     </div>
@@ -126,9 +126,14 @@ html,body {
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
+      const pawTrail = [{x: 0, y: 6}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
+        {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},  // First Trail
+        {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
+        {x: 8, y: 1}, {x: 9, y: 1}, {x: 9, y: 0}]; // Second Trail
       //TODO: Use less dynamic global variables
+      var keyFrame = 0;
 
-      function drawPawGrid(){
+      function drawPawGrid(type){
         const pawOverlay = document.getElementById("paw-overlay");
         const pawFragment = document.createDocumentFragment();
         for (var i = 0; i < 7; i++){
@@ -137,11 +142,41 @@ html,body {
             paw.className = "paw x-" + j + " y-" + i;
             paw.setAttribute('src', 'http://localhost:8080/sticker-paw-blue.svg');
             pawFragment.append(paw);
+            if (type == "random" && Math.trunc(Math.random() * 3) == 0){
+              paw.style = "opacity: 0.5";
+            } else if (type == "all") {
+              paw.style = "opacity: 0.5";
+            } else if (type == "trail"){
+              animatePaw(paw, j, i);
+            } else if (type == "none"){
+
+            }
           }
         }
-        pawOverlay.append(pawFragment);
+        pawOverlay.replaceChildren(pawFragment);
       }
 
+      function animatePaw(paw, x, y){
+        const style = "opacity: 0.5";
+        if (pawTrail[keyFrame].x == x && pawTrail[keyFrame].y == y){
+          paw.style = style;
+        }
+        if (keyFrame < pawTrail.length - 1){
+          if (pawTrail[keyFrame + 1].x == x && pawTrail[keyFrame + 1].y == y){
+            paw.style = style;
+          }
+        }
+
+        if (pawTrail[keyFrame].x == x && pawTrail[keyFrame].y == y){
+          paw.style = style;
+        }
+        if (keyFrame < pawTrail.length - 1){
+          if (pawTrail[keyFrame + 1].x == x && pawTrail[keyFrame + 1].y == y){
+            paw.style = style;
+          }
+        }
+      }
+      
       function getParams(){
         // Get the names of garages to be displayed
         const urlParams = new URLSearchParams(window.location.search);
@@ -461,6 +496,8 @@ html,body {
         });
         setCounts(); // Add the actual divs to display counts
         fullGarages = [];
+        drawPawGrid("none");
+        keyFrame = keyFrame == pawTrail.length - 1 ? 0 : keyFrame += 1; 
       }
       main();
       setInterval(async () => {
