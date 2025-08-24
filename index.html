@@ -126,10 +126,18 @@ html,body {
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
-      const pawTrail = [{x: 0, y: 6}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
-        {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},  // First Trail
-        {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
-        {x: 8, y: 1}, {x: 9, y: 1}, {x: 9, y: 0}]; // Second Trail
+      const pawTrail = [{x: 0, y: 5}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
+        {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},{x: 5, y: 0},  // First Trail
+        {x:5, y: 5}, {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
+        {x: 8, y: 1}, {x: 9, y: 1}, {x: 9, y: 0}, // Second Trail
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}
+        // Pause frames
+      ];
       //TODO: Use less dynamic global variables
       var keyFrame = 0;
 
@@ -157,16 +165,7 @@ html,body {
       }
 
       function animatePaw(paw, x, y){
-        const style = "opacity: 0.5";
-        if (pawTrail[keyFrame].x == x && pawTrail[keyFrame].y == y){
-          paw.style = style;
-        }
-        if (keyFrame < pawTrail.length - 1){
-          if (pawTrail[keyFrame + 1].x == x && pawTrail[keyFrame + 1].y == y){
-            paw.style = style;
-          }
-        }
-
+        const style = "opacity: 0.7";
         if (pawTrail[keyFrame].x == x && pawTrail[keyFrame].y == y){
           paw.style = style;
         }
