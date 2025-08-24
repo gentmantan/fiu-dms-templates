@@ -202,18 +202,40 @@ html,body {
           mode: "cors"
         };
         if (type == "sensors"){
-          const response = await fetch(dataSources["sensors"], requestParams)
-            .then(function (response) {
-              return response.arrayBuffer();
-            })
-            .then(function (buffer) {
-              const decoder = new TextDecoder('utf-16le');
-              const text = decoder.decode(buffer);
-              xmlText = text;
-            }); // Sensor counts data is encoded in utf-16le and needs to be converted
+          try {
+            const response = await fetch(dataSources["sensors"], requestParams)
+              .then(function (response) {
+                if (!response.ok) {
+                  throw new Error(response.status);
+                }
+                return response.arrayBuffer();
+              })
+              .then(function (buffer) {
+                const decoder = new TextDecoder('utf-16le');
+                const text = decoder.decode(buffer);
+                xmlText = text;
+                sessionStorage.setItem('sensors', text);
+              }); // Sensor counts data is encoded in utf-16le and needs to be converted
+          } catch (error) {
+            console.error("Error " + error.message);
+            if (sessionStorage.getItem('sensors')) {
+              xmlText = sessionStorage.getItem('sensors');
+            }
+          }
         } else if (type == "genetec"){
-          const response = await fetch(dataSources["genetec"], requestParams);
-          xmlText = await response.text();
+          try {
+            const response = await fetch(dataSources["genetec"], requestParams);
+            if (!response.ok) {
+              throw new Error(response.status);
+            }
+            xmlText = await response.text();
+            sessionStorage.setItem('genetec', xmlText);
+          } catch (error) {
+            console.error("Error " + error.message);
+            if (sessionStorage.getItem('genetec')) {
+              xmlText = sessionStorage.getItem('genetec');
+            }
+          }
         }
         const parser = new DOMParser();
         xmlDoc = parser.parseFromString(xmlText, "application/xml");
