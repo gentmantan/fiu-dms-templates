@@ -113,7 +113,7 @@ html,body {
     <div class="container">
       <div id="card-grid"></div>
       <div class="message-grid">
-        <img class="paw" src="http://localhost:8080/sticker-paw-blue.svg" style="opacity: 1.0;">
+        <img id="message-paw" class="paw" src="http://localhost:8080/sticker-paw-blue.svg" style="opacity: 1.0;">
         <h2 class="message">Please Link Your Plate!</h2>
       </div>
     </div>
@@ -124,6 +124,7 @@ html,body {
       let fullGarages = [];
       let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
+      const pawSources = {"normal": "http://localhost:8080/sticker-paw-blue.svg", "error": "http://localhost:8080/sticker-paw-blue-error.svg"}
       const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
       const pawTrail = [{x: 0, y: 5}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
@@ -148,7 +149,7 @@ html,body {
           for (var j = 0; j < 10; j++){
             const paw = document.createElement("img");
             paw.className = "paw x-" + j + " y-" + i;
-            paw.setAttribute('src', 'http://localhost:8080/sticker-paw-blue.svg');
+            paw.setAttribute('src', pawSources["normal"]);
             pawFragment.append(paw);
             if (type == "random" && Math.trunc(Math.random() * 3) == 0){
               paw.style = "opacity: 0.5";
