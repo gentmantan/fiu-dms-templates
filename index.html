@@ -124,9 +124,9 @@ html,body {
       let fullGarages = [];
       let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
-      const sensorsList = [ "PG1", "PG2", "PG4", "PG6" ]
       const pawSources = {"normal": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-blue.svg", 
         "error": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-blue-error.svg"};
+      const sensorsList = [ "PG4", "PG6" ]
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
       const pawTrail = [{x: 0, y: 5}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
         {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},{x: 5, y: 0},  // First Trail
