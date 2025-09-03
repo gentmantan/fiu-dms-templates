@@ -132,14 +132,12 @@ html,body {
       const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
       const pawTrail = [{x: 0, y: 5}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
         {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},{x: 5, y: 0},  // First Trail
-        {x:5, y: 5}, {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
+        {x: -1, y: -1}, {x: -1, y: -1}, {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
         {x: 8, y: 1}, {x: 9, y: 1}, {x: 9, y: 0}, // Second Trail
         {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
         {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
         {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
         {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
-        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, 
-        {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}, {x: -1, y: -1}
         // Pause frames
       ];
       //TODO: Use less dynamic global variables
@@ -169,7 +167,7 @@ html,body {
       }
 
       function animatePaw(paw, x, y){
-        const style = "opacity: 0.7";
+        const style = "opacity: 1";
         if (pawTrail[keyFrame].x == x && pawTrail[keyFrame].y == y){
           paw.style = style;
         }
@@ -543,7 +541,7 @@ html,body {
       main();
       setInterval(async () => {
         await main();
-      }, 1000);
+      }, 500);
     </script> 
   </body>
 </html>
