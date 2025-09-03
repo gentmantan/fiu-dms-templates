@@ -493,12 +493,13 @@ html,body {
           parkingType.className = "parking-type";
           parkingType.textContent = key;
           // Create count number element (# of spaces)
-          const parkingValue = document.createElement("p");
-          parkingValue.className = "parking-value";
-          parkingValue.textContent = value;
-
           parkingDatum.append(parkingType);
-          parkingDatum.append(parkingValue);
+          if (value != "null"){ 
+            const parkingValue = document.createElement("p");
+            parkingValue.className = "parking-value";
+            parkingValue.textContent = value;
+            parkingDatum.append(parkingValue);
+          }
 
           clone.querySelector(".data").append(parkingDatum);
         }
