@@ -113,8 +113,8 @@ html,body {
     <div class="container">
       <div id="card-grid"></div>
       <div class="message-grid">
-        <h2 class="message">Please Link Your Plate!</h2>
         <img id="message-paw" class="paw" src="https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-solid-gold.svg" style="opacity: 1.0;">
+        <h2 id="underline-message" class="message">Please Link Your Plate!</h2>
       </div>
     </div>
     <div id="paw-overlay">
@@ -123,6 +123,7 @@ html,body {
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
       let garageParams = getParams();
+      var message = null;
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const pawSources = {"normal": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-solid-gold.svg", 
         "error": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-blue-error.svg"};
@@ -184,7 +185,13 @@ html,body {
         if (urlParams.has('hide-message')) {
           document.getElementsByClassName("message-grid")[0].style = "display: none";
         }
+        if (urlParams.has('message')) {
+          message = urlParams.get('message');
+        }
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG5" ];
+      }
+      function setMessage(){
+        document.getElementById("underline-message").textContent = message;
       }
       function filterData(garages, isSensors) {
         garageList = [];
@@ -521,6 +528,9 @@ html,body {
         fullGarages = [];
         drawPawGrid("none");
         keyFrame = keyFrame == pawTrail.length - 1 ? 0 : keyFrame += 1; 
+        if (message) {
+          setMessage();
+        }
       }
       main();
       setInterval(async () => {
