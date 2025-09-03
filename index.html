@@ -123,6 +123,7 @@ html,body {
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
       let garageParams = getParams();
+      var enablePaws = false;
       var message = null;
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const pawSources = {"normal": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-solid-gold.svg", 
@@ -184,6 +185,9 @@ html,body {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('hide-message')) {
           document.getElementsByClassName("message-grid")[0].style = "display: none";
+        }
+        if (urlParams.has('enable-paws')) {
+          enablePaws = true;
         }
         if (urlParams.has('message')) {
           message = urlParams.get('message');
@@ -526,7 +530,11 @@ html,body {
         });
         setCounts(); // Add the actual divs to display counts
         fullGarages = [];
-        drawPawGrid("none");
+        if (enablePaws) {
+          drawPawGrid("trail");
+        } else {
+          drawPawGrid("none");
+        }
         keyFrame = keyFrame == pawTrail.length - 1 ? 0 : keyFrame += 1; 
         if (message) {
           setMessage();
