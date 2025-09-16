@@ -124,12 +124,12 @@ html,body {
       let fullGarages = [];
       let garageParams = getParams();
       var enablePaws = false;
-      var message = null;
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const pawSources = {"normal": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-solid-gold.svg", 
         "error": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-blue-error.svg"};
       const sensorsList = [ "PG4", "PG6" ]
-      const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5", "Lot 4"]]; // Define garages to swap between when full
+      const garageGroups = [["PG5", "PG4", "PG6", "Lot 1"], [ "PG1", "PG2", "Lot 5"]]; // Define garages to swap between when full
+      // TODO: make this into a dictionary of group name: group list pairs
       const pawTrail = [{x: 0, y: 5}, {x: 0, y: 5}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 3}, {x: 3, y: 3},
         {x: 3, y: 2}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 0},{x: 5, y: 0},  // First Trail
         {x: -1, y: -1}, {x: -1, y: -1}, {x: 5, y: 5}, {x: 5, y: 4}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 8, y: 2}, 
@@ -188,13 +188,35 @@ html,body {
           enablePaws = true;
         }
         if (urlParams.has('message')) {
-          message = urlParams.get('message');
+          // setMessage(urlParams.get('message'));
+          // TODO: Handle case where there is a custom message and a full message
         }
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG5" ];
       }
-      function setMessage(){
+      function setMessage(message){
         document.getElementById("underline-message").textContent = message;
       }
+      function isFullMessage(){
+        const countCards = document.getElementsByClassName("card");
+        var isAllFull = true;
+        for (const card of countCards) {
+          if (card.getElementsByClassName("parking-value")[0].textContent != "Full"){
+            isAllFull = false;
+          }
+        }
+        if (isAllFull){
+          setFullMessage();
+        } else {
+          setNormalMessage();
+        }
+      }
+      function setFullMessage(){
+        setMessage("Open Spaces: Tamiami");
+      }
+      function setNormalMessage(){
+        setMessage("Please link your plate!");
+      }
+
       function filterData(garages, isSensors) {
         garageList = [];
         garages.forEach(function(garage){
@@ -535,9 +557,7 @@ html,body {
           drawPawGrid("none");
         }
         keyFrame = keyFrame == pawTrail.length - 1 ? 0 : keyFrame += 1; 
-        if (message) {
-          setMessage();
-        }
+        isFullMessage();
       }
       main();
       setInterval(async () => {
