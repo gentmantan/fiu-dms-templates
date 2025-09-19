@@ -314,7 +314,7 @@ html,body {
 
       function formatCountType(zoneName, available){
         // Create an object pairing count type with count value
-        if (available <= 10){
+        if (available <= 20){
           available = "Full"
         }
         if (zoneName.match("Lvls 1")) {
@@ -404,7 +404,7 @@ html,body {
           const available = capacity - vehicles < 0 ? 0 : capacity - vehicles;
           const occupancyIndex = garageIndex(occupancyList, displayName);
           if (getFull) {
-            if (available <= 10 && getCountType(zoneName) == "upper" && !fullGarages.includes(displayName) && !sensorsList.includes(displayName)){
+            if (available <= 20 && getCountType(zoneName) == "upper" && !fullGarages.includes(displayName) && !sensorsList.includes(displayName)){
               // If garage is full, add to fullGarages 
               fullGarages.push(displayName);
             }
@@ -446,11 +446,11 @@ html,body {
 
           const studentSpaces = parseInt(item.getElementsByTagName("StudentSpaces")[0].textContent, 10);
           const studentMax = parseInt(item.getElementsByTagName("StudentMax")[0].textContent, 10);
-          const studentAvailable = { "Student": studentMax - studentSpaces <= 0 ? "Full" : studentMax - studentSpaces };
+          const studentAvailable = { "Student": studentMax - studentSpaces <= 20 ? "Full" : studentMax - studentSpaces };
 
           const otherSpaces = parseInt(item.getElementsByTagName("OtherSpaces")[0].textContent, 10);
           const otherMax = parseInt(item.getElementsByTagName("OtherMax")[0].textContent, 10);
-          const otherAvailable = { "Other": otherMax - otherSpaces <= 0 ? "Full" : otherMax - otherSpaces };
+          const otherAvailable = { "Other": otherMax - otherSpaces <= 20 ? "Full" : otherMax - otherSpaces };
           if (getFull) {
             if (studentAvailable["Student"] == "Full" && !fullGarages.includes(displayName) && sensorsList.includes(displayName)){
               fullGarages.push(displayName);
