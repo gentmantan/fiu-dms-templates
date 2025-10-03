@@ -100,6 +100,10 @@ html,body {
   height: 12vh;
   opacity: 0.0;
 }
+.arrow {
+  height: 15cqh;
+  fill: #FFCC00;
+}
 </style>
   </head>
   <body>
@@ -109,6 +113,9 @@ html,body {
         <hr class="hr-gold">
         <div class="data"></div>
       </div>
+    </template>
+    <template id="_right-arrow-template">
+      <svg class="arrow parking-type" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></svg>
     </template>
     <div class="container">
       <div id="card-grid"></div>
@@ -122,8 +129,9 @@ html,body {
     <script>
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
-      let garageParams = getParams();
       var enablePaws = false;
+      var arrows = {rightArrow: [], leftArrow: [], upArrow: [], downArrow: []};
+      let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
       const pawSources = {"normal": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-solid-gold.svg", 
         "error": "https://parking.fiu.edu/parking-garage-counts/parking-counts-unified/sticker-paw-blue-error.svg"};
@@ -190,6 +198,9 @@ html,body {
         if (urlParams.has('message')) {
           // setMessage(urlParams.get('message'));
           // TODO: Handle case where there is a custom message and a full message
+        }
+        if (urlParams.has('rarrow')) {
+          arrows.rightArrow = urlParams.get('rarrow').split(",");
         }
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG5" ];
       }
@@ -321,6 +332,8 @@ html,body {
           return { "Other": available };
         } else if (zoneName.match("Lvls 3")) {
           return { "Student": available };
+        } else if (zoneName.match("rightArrow")){
+          return { "_right-arrow-template": null };
         } else {
           return {"Available Spaces": available};
         }
@@ -428,7 +441,12 @@ html,body {
                     occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available)});
                   }
                 } else {
-                  occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
+                  // Add non-split counts
+                  if (arrows.rightArrow.includes(displayName)) {
+                    occupancyList.push({ zoneName, displayName, capacity, vehicles, available: {...formatCountType(zoneName, available), ...formatCountType("rightArrow", null)} });
+                  } else {
+                    occupancyList.push({ zoneName, displayName, capacity, vehicles, available: formatCountType(zoneName, available) });
+                  }
                 }
               }
             });
@@ -511,18 +529,25 @@ html,body {
           const parkingDatum = document.createElement("div");
           parkingDatum.className = "parking-datum";
           // Create count type element (Student, Other)
-          const parkingType = document.createElement("h3");
-          parkingType.className = "parking-type";
-          parkingType.textContent = key;
-          // Create count number element (# of spaces)
-          parkingDatum.append(parkingType);
-          if (value != "null"){ 
-            const parkingValue = document.createElement("p");
-            parkingValue.className = "parking-value";
-            parkingValue.textContent = value;
-            parkingDatum.append(parkingValue);
+          if (!key.match("_")){
+            // Display normal count content
+            const parkingType = document.createElement("h3");
+            parkingType.className = "parking-type";
+            parkingType.textContent = key;
+            parkingDatum.append(parkingType);
+            if (value != "null"){ 
+              const parkingValue = document.createElement("p");
+              parkingValue.className = "parking-value";
+              parkingValue.textContent = value;
+              parkingDatum.append(parkingValue);
+            }
+          } else {
+            // Display arrows 
+            const template = document.getElementById(key);
+            const clone = document.importNode(template.content, true);
+            parkingDatum.append(clone);
           }
-
+          // Create count number element (# of spaces)
           clone.querySelector(".data").append(parkingDatum);
         }
         cardFragment.append(clone);
