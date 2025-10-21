@@ -130,6 +130,7 @@ html,body {
       let occupancyList = []; // All garages to be displayed
       let fullGarages = [];
       var enablePaws = false;
+      var tamiamiSwitch = false;
       var arrows = {rightArrow: [], leftArrow: [], upArrow: [], downArrow: []};
       let garageParams = getParams();
       const dataSources = { "sensors": "http://localhost:8080/garagecounts.xml", "genetec": "http://localhost:8080/occupancy.xml" };
@@ -201,6 +202,9 @@ html,body {
         }
         if (urlParams.has('rarrow')) {
           arrows.rightArrow = urlParams.get('rarrow').split(",");
+        }
+        if (urlParams.has('tamiami')) {
+          tamiamiSwitch = true;
         }
         return urlParams.has('garages') ? urlParams.get('garages').split(",") : [ "Lot 1", "PG5" ];
       }
@@ -582,7 +586,9 @@ html,body {
           drawPawGrid("none");
         }
         keyFrame = keyFrame == pawTrail.length - 1 ? 0 : keyFrame += 1; 
-        isFullMessage();
+        if (tamiamiSwitch){
+          isFullMessage();
+        }
       }
       main();
       setInterval(async () => {
