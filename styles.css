@@ -1,0 +1,100 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+}
+body {
+  background-color: #081e3f;
+  color: white; /* Change this! */
+  overflow: hidden;
+}
+html,
+body {
+  height: 100%;
+}
+#card-grid {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0px, 1fr));
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border: 1cqb solid #b6862c;
+}
+.data {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column; /* Change to row for wide displays */
+  justify-content: space-evenly;
+  text-align: center;
+}
+.card p,
+h2,
+h3 {
+  font-weight: bold;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+}
+.message-grid {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: 6cqi;
+}
+.message {
+  font-size: 12cqh;
+  text-align: center;
+  font-stretch: condensed;
+  white-space: nowrap;
+}
+.hr-gold {
+  border: 1cqb solid #b6862c;
+}
+.parking-datum {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
+}
+.parking-type {
+  font-size: 10cqb;
+}
+.parking-value {
+  font-size: 15cqb;
+  color: #ffcc00;
+}
+.title {
+  font-size: 18cqb;
+}
+#paw-overlay {
+  position: fixed;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10vw, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(13vh, 1fr));
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+}
+.paw {
+  height: 12vh;
+  opacity: 0;
+}
+.arrow {
+  height: 15cqh;
+  fill: #ffcc00;
+}
